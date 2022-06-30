@@ -1,7 +1,7 @@
 from Core.exception import *
 
 class Connector:
-    COMMANDS_LIST = ["ENUM_VALUES","ENUM_KEYS","FINISH", "RESET", "SUM", "GET_VALUES", "LIST", "GET", "DELETE", "ADD", "SET", "DSUM"]
+    COMMANDS_LIST = ["ENUM_VALUES","ENUM_VALUES","ENUM_KEYS","FINISH", "RESET", "SUM", "GET_VALUES", "LIST", "GET", "DELETE", "ADD", "SET", "DSUM"]
 
     def examine(self, msg):
         result = self.__check_input(msg)
@@ -62,6 +62,10 @@ class Connector:
                 if len(command) == 2:
                     dst = [command[1]]
                 return "ENUM_KEYS", dst
+
+            if command[0].upper() == "ENUM_VALUES":
+                dst, var = self.__break_command(command)
+                return "ENUM_VALUES", dst, var
 
 
     def __check_input(self, msg):

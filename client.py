@@ -9,9 +9,8 @@ URL = "connect.repo."
 class CallbackHandler(object):
 
     @Pyro4.callback
-    def call1(self):
-        print("callback 1 received from server!")
-        print("going to crash - you won't see the exception here, only on the server")
+    def call(self, repo):
+        print(list(enumerate(repo)))
 
 
 def connect_to_server(server_name_):
@@ -82,7 +81,15 @@ def connect_to_server(server_name_):
                 t1.start()
                 server.enum_keys(callback)
 
-                print("You are here")
+            case "ENUM_VALUES":
+                daemon = Pyro4.core.Daemon()
+                callback = CallbackHandler()
+                daemon.register(callback)
+                server = Pyro4.Proxy("PYRONAME:" + URL + ns)
+                server._pyroOneway.add("enum_values")
+                t1 = threading.Thread(target=daemon.requestLoop)
+                t1.start()
+                server.enum_values(command[2],callback)
 
 
 def bring_up_server(command_, ns):

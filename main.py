@@ -5,7 +5,6 @@ import sys
 # TODO: Handle if peers are not here
 # TODO: DO unregister when the server is going down
 # TODO: DO Unregister when it is not resppnding anymore
-# TODO: Do Enumeration
 
 def start_server(server_name_, known_registry_):
     rs = RepositoryService(server_name_, Repository)
