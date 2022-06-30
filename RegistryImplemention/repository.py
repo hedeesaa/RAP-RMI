@@ -68,8 +68,23 @@ class Repository(IDistributedRepository):
         IDistributedRepository.repo = {}
         return False, "OK"
 
-    def aggregate(self, peer_list): pass
-        # for peer in peer_list:
+    def aggregate(self, variable, peer_list):
+        print("In the aggregation")
+        print(peer_list)
+        err = False
+        res = 0
+        for peer in peer_list:
+            if peer in IDistributedRepository.peers.keys():
+                server= Pyro4.Proxy("PYRONAME:" + "connect.repo." + peer)
+                _,value=server.sum(variable)
+                res += value
+            else:
+                err = True
+                res = f"Peer {peer} Is Not Existed"
+                break
+
+        return err, res
+
 
 
 

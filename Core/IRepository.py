@@ -73,5 +73,6 @@ class IDistributedRepository(IRepository):
     def reset(self): pass
 
     @abstractmethod
-    def aggregate(self,peer_list) -> IAggregate: pass
+    def aggregate(self, peer_list) -> IAggregate: pass
+
     

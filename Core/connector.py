@@ -51,6 +51,13 @@ class Connector:
                     dst = [command[1]]
                 return "RESET", dst
 
+            # DSUM
+            if command[0].upper() == "DSUM":
+                var = command[1]
+                dst = command[3:]
+                return "DSUM", dst, var
+
+
     def __check_input(self, msg):
         """
         Checks Message Input of a User

@@ -1,4 +1,3 @@
-import sys
 import Pyro4
 from Core.connector import Connector
 import sys
@@ -56,6 +55,12 @@ def connect_to_server(server_name_):
             case "RESET":
                 server = bring_up_server(command[1], ns)
                 _, value = server.reset()
+                print(value)
+
+            case "DSUM":
+                server = bring_up_server([], ns)
+                print(command)
+                value = server.aggregate(command[-1],command[1])
                 print(value)
 
 
