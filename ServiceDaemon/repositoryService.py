@@ -17,7 +17,7 @@ class RepositoryService:
         self.repository = repository
         self.ns = Pyro4.locateNS()
 
-    def start_demon(self):
+    def start_daemon(self):
         
         t1 = threading.Thread(target=self.start_join_daemon)
         t1.start()
@@ -30,7 +30,7 @@ class RepositoryService:
         address_join = RepositoryService.URL_JOIN + self.id
         self.ns.register(address_join, str(r_join))
 
-        print(f'Ready to listen to {address_join}')
+        print(f'Listening to {address_join} ...')
         self.daemon_join.requestLoop()
 
     def start_repo_daemon(self):
@@ -38,16 +38,23 @@ class RepositoryService:
         address_repo = RepositoryService.URL_REPO + self.id
         self.ns.register(address_repo, str(r_repo))
 
-        print(f'Ready to listen to {address_repo}')
+        print(f'Listening to {address_repo} ...')
         self.daemon_repo.requestLoop()
+
+    def join_peer_startup(self, peer):
+        if peer != self.id:
+            try:
+                # saving itself in the peer
+                self.__join_helper(peer, self.id)
+            except:
+                print(f"Peer {peer} Does Not Respond")
+                exit()
 
     def join_peer(self, peer):
         # saving itself in itself
         self.__join_helper(self.id, self.id)
 
-        # saving itself in the peer
         if peer != self.id:
-            self.__join_helper(peer, self.id)
             # saving peer in itself
             self.__join_helper(self.id, peer)
 
@@ -55,6 +62,7 @@ class RepositoryService:
         t1.start()
 
     def __join_helper(self, dst, info):
+        print(f"dest: {dst}, info: {info}")
         server = Pyro4.Proxy("PYRONAME:"+RepositoryService.URL_JOIN + dst)
         server.register(info, RepositoryService.URL_REPO + info)
 
