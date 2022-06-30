@@ -1,4 +1,4 @@
-from Core.exception import *
+from Core.RepException import *
 
 
 class Connector:
