@@ -1,22 +1,22 @@
 import Pyro4
 from Core.IDirectory import IRegistry
-from Core.IRepository import IRepository
 
 
 @Pyro4.expose
 class Registry(IRegistry):
 
-    def find(self, server_id: str) -> IRepository:
-        pass
+    def find(self, server_id):
+        for server_id in IRegistry.peers.keys():
+            return IRegistry.peers.keys[server_id]
 
-    def list_peers(self) -> list:
+    def list_peers(self):
         return IRegistry.peers
 
-    def unregister(self, server_id: str):
+    def unregister(self, server_id):
         del IRegistry.peers[server_id]
+        print(IRegistry.peers)
 
     def register(self, server_id, url):
-
         IRegistry.peers[server_id] = url
         print(IRegistry.peers)
 

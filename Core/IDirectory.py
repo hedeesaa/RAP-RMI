@@ -5,10 +5,10 @@ class IDirectory(ABC):
     peers = {}
 
     @abstractmethod
-    def find(self, server_id: str) : pass
+    def find(self, server_id: str): pass
 
     @abstractmethod
-    def list_peers(self) -> list : pass
+    def list_peers(self) -> list: pass
 
 
 class IRegistry(IDirectory):
@@ -24,3 +24,4 @@ class IRegistry(IDirectory):
 
     @abstractmethod
     def unregister(self, server_id: str): pass
+    

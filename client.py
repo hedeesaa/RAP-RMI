@@ -9,8 +9,11 @@ URL = "connect.repo."
 class CallbackHandler(object):
 
     @Pyro4.callback
-    def call(self, repo):
-        print(list(enumerate(repo)))
+    def call(self, err, repo):
+        if not err:
+            print(list(enumerate(repo)))
+        else:
+            print("Not Existed!")
 
 
 def connect_to_server(server_name_):
@@ -67,29 +70,24 @@ def connect_to_server(server_name_):
 
             case "DSUM":
                 server = bring_up_server([], ns)
-                print(command)
-                value = server.aggregate(command[-1], command[1])
+                _, value = server.aggregate(command[-1], command[1])
                 print(value)
 
             case "ENUM_KEYS":
-                daemon = Pyro4.core.Daemon()
-                callback = CallbackHandler()
-                daemon.register(callback)
-                server = Pyro4.Proxy("PYRONAME:" + URL + ns)
-                server._pyroOneway.add("enum_keys")
-                t1 = threading.Thread(target=daemon.requestLoop)
-                t1.start()
-                server.enum_keys(callback)
+                server = bring_up_server(command[1], ns)
+                server.enum_keys(enum_controller())
 
             case "ENUM_VALUES":
-                daemon = Pyro4.core.Daemon()
-                callback = CallbackHandler()
-                daemon.register(callback)
-                server = Pyro4.Proxy("PYRONAME:" + URL + ns)
-                server._pyroOneway.add("enum_values")
-                t1 = threading.Thread(target=daemon.requestLoop)
-                t1.start()
-                server.enum_values(command[2],callback)
+                server = bring_up_server(command[1], ns)
+                server.enum_values(command[2], enum_controller())
+
+def enum_controller():
+    daemon = Pyro4.core.Daemon()
+    callback = CallbackHandler()
+    daemon.register(callback)
+    t1 = threading.Thread(target=daemon.requestLoop)
+    t1.start()
+    return callback
 
 
 def bring_up_server(command_, ns):

@@ -2,9 +2,8 @@ from ServiceDaemon.repositoryService import RepositoryService
 from RegistryImplemention.repository import Repository
 import sys
 
-# TODO: Handle if peers are not here
-# TODO: DO unregister when the server is going down
-# TODO: DO Unregister when it is not resppnding anymore
+# TODO: Handle if it cannot find its startup peer
+
 
 def start_server(server_name_, known_registry_):
     rs = RepositoryService(server_name_, Repository)

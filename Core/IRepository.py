@@ -19,24 +19,19 @@ class IRepository(IAggregate):
     def set_variable(self, variable: str, value: int): pass
 
     @abstractmethod
-    def add_variable(self, variable: str, value: int) : pass
-        
+    def add_variable(self, variable: str, value: int): pass
 
     @abstractmethod
     def delete_variable(self, variable: str) -> bool: pass
-        
 
     @abstractmethod
-    def list_keys(self) : pass
-        
+    def list_keys(self): pass
 
     @abstractmethod
     def get_value(self, variable: str): pass
-        
 
     @abstractmethod
     def get_values(self, variable: str): pass
-        
 
     @abstractmethod
     def reset(self): pass
@@ -45,30 +40,25 @@ class IRepository(IAggregate):
 class IDistributedRepository(IRepository):
     peers = IDirectory.peers
     @abstractmethod
-    def sum(self, variable: str)  -> int: pass
+    def sum(self, variable: str) -> int: pass
 
     @abstractmethod
     def set_variable(self, variable: str, value: int): pass
 
     @abstractmethod
-    def add_variable(self, variable: str, value: int) : pass
-        
+    def add_variable(self, variable: str, value: int): pass
 
     @abstractmethod
     def delete_variable(self, variable: str) -> bool: pass
-        
 
     @abstractmethod
-    def list_keys(self) : pass
-        
+    def list_keys(self): pass
 
     @abstractmethod
     def get_value(self, variable: str): pass
-        
 
     @abstractmethod
     def get_values(self, variable: str): pass
-        
 
     @abstractmethod
     def reset(self): pass
