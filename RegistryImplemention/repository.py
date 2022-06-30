@@ -16,6 +16,7 @@ class Repository(IDistributedRepository):
         res = "OK"
         try:
             IDistributedRepository.repo[variable].append(value)
+
         except:
             error = True
             res = "Variable Does Not Exist"
@@ -84,6 +85,33 @@ class Repository(IDistributedRepository):
                 break
 
         return err, res
+
+    @Pyro4.callback
+    def enum_keys(self, callback):
+        try:
+            print("In the call")
+            callback.call1()
+        except:
+            print("got an exception from the callback.")
+            print("".join(Pyro4.util.getPyroTraceback()))
+        print("server: doing callback 2 to client")
+        # enum = enumerate(IDistributedRepository.repo.keys())
+        #
+        # # print(list(enum))
+        #
+        # return enum
+
+    def doCallback(self, callback):
+        print("server: doing callback 1 to client")
+        try:
+            callback.call1()
+        except:
+            print("got an exception from the callback.")
+            print("".join(Pyro4.util.getPyroTraceback()))
+
+    def enum_values(self, variable, callback):
+        pass
+
 
 
 

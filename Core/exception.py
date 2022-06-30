@@ -5,4 +5,5 @@ class Error(Exception):
 
 
 class CommandIsNotValid(Error):
+    """Command Is Not Valid"""
     pass

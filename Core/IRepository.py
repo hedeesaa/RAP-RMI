@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from Core.IDirectory import IDirectory
+from Core.ICallback import ICallback
 
 
 class IAggregate(ABC):
@@ -74,5 +75,12 @@ class IDistributedRepository(IRepository):
 
     @abstractmethod
     def aggregate(self, peer_list) -> IAggregate: pass
+
+    @abstractmethod
+    def enum_keys(self, callback: ICallback): pass
+
+    @abstractmethod
+    def enum_values(self, variable, callback: ICallback): pass
+
 
     

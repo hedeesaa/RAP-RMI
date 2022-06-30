@@ -1,8 +1,17 @@
 import Pyro4
 from Core.connector import Connector
 import sys
-
+import threading
 URL = "connect.repo."
+
+
+@Pyro4.expose
+class CallbackHandler(object):
+
+    @Pyro4.callback
+    def call1(self):
+        print("callback 1 received from server!")
+        print("going to crash - you won't see the exception here, only on the server")
 
 
 def connect_to_server(server_name_):
@@ -60,8 +69,20 @@ def connect_to_server(server_name_):
             case "DSUM":
                 server = bring_up_server([], ns)
                 print(command)
-                value = server.aggregate(command[-1],command[1])
+                value = server.aggregate(command[-1], command[1])
                 print(value)
+
+            case "ENUM_KEYS":
+                daemon = Pyro4.core.Daemon()
+                callback = CallbackHandler()
+                daemon.register(callback)
+                server = Pyro4.Proxy("PYRONAME:" + URL + ns)
+                server._pyroOneway.add("enum_keys")
+                t1 = threading.Thread(target=daemon.requestLoop)
+                t1.start()
+                server.enum_keys(callback)
+
+                print("You are here")
 
 
 def bring_up_server(command_, ns):

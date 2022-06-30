@@ -9,7 +9,7 @@ import time
 
 class RepositoryService:
     # RMI Responsible
-    def __init__(self, server_id, repository, url_join="join.repo." ):
+    def __init__(self, server_id, repository, url_join="join.repo."):
         self.url_join = url_join
         self.url_repo = "connect.repo."
         self.id = server_id
@@ -17,7 +17,6 @@ class RepositoryService:
         self.daemon_repo = Pyro4.Daemon()
         self.repository = repository
         self.ns = Pyro4.locateNS()
-
 
     def start_demon(self):
         
@@ -27,9 +26,7 @@ class RepositoryService:
         t2 = threading.Thread(target=self.start_repo_daemon)
         t2.start()
 
-
     def start_join_daemon(self):
-        
         r_join = self.daemon_join.register(Registry)
         address_join = self.url_join + self.id
         self.ns.register(address_join, str(r_join))
@@ -51,7 +48,6 @@ class RepositoryService:
         server = Pyro4.Proxy("PYRONAME:join.repo."+self.id)
         server.register(self.id, "connect.repo."+self.id)
 
-
         # saving itself in the peer
         if peer != self.id:
             server = Pyro4.Proxy("PYRONAME:join.repo." + peer)
@@ -62,7 +58,6 @@ class RepositoryService:
 
         t1 = threading.Thread(target=self.getting_update())
         t1.start()
-
 
     def getting_update(self):
         while True:
