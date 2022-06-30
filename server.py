@@ -1,14 +1,14 @@
-# This is distribution class
-
 from ServiceDaemon.repositoryService import RepositoryService
 from RegistryImplemention.repository import Repository
 import sys
-import Pyro4
 
 
 def start_server(server_name_, known_registry_):
     rs = RepositoryService(server_name_, Repository)
-    rs.start_demon()
+    # Join to peer which was defined at startup
+    rs.join_peer_startup(known_registry_)
+
+    rs.start_daemon()
     rs.join_peer(known_registry_)
 
 
