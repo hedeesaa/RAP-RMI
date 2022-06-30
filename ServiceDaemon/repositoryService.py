@@ -73,7 +73,6 @@ class RepositoryService:
                     set1 = set(Registry.peers.items())
                     set2 = set(a.items())
                     i_dont_have = set2 - set1
-                    print(i_dont_have)
                     for j in i_dont_have:
                         server = Pyro4.Proxy("PYRONAME:join.repo." + self.id)
                         server.register(j[0], "connect.repo." + j[0])
