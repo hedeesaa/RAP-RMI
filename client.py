@@ -96,6 +96,7 @@ def connect_to_server(server_name_):
 
 
 def enum_controller():
+    Pyro4.config.SERIALIZERS_ACCEPTED.add('dill')
     daemon = Pyro4.core.Daemon()
     callback = CallbackHandler()
     daemon.register(callback)
