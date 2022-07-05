@@ -2,6 +2,7 @@ import Pyro4
 from Core.connector import Connector
 import sys
 import threading
+import dill
 URL = "connect.repo."
 
 
@@ -25,54 +26,62 @@ def connect_to_server(server_name_):
                 break
 
             connector = Connector()
-            command = connector.examine(command)
+            command = connector.examine(command, server_name_)
             ns = server_name_
 
             match command[0]:
                 case "SET":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.set_variable(command[2], command[3])
+                    _, value = command[1].set_variable(command[2], command[3])
                     print(value)
 
                 case "ADD":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.add_variable(command[2], command[3])
+                    _, value = command[1].add_variable(command[2], command[3])
                     print(value)
 
                 case "GET":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.get_value(command[2])
+                    _, value = command[1].get_value(command[2])
                     print(value)
 
                 case "GET_VALUES":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.get_values(command[2])
+                    _, value = command[1].get_values(command[2])
                     print(value)
 
                 case "DELETE":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.delete_variable(command[2])
+                    _, value = command[1].delete_variable(command[2])
                     print(value)
 
                 case "LIST":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.list_keys()
+                    _, value = command[1].list_keys()
                     print(value)
 
                 case "SUM":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.sum(command[2])
+                    _, value = command[1].sum(command[2])
                     print(value)
 
                 case "RESET":
-                    server = bring_up_server(command[1], ns)
-                    _, value = server.reset()
+                    _, value = command[1].reset()
                     print(value)
 
                 case "DSUM":
-                    server = bring_up_server([], ns)
-                    _, value = server.aggregate(command[-1], command[1])
-                    print(value)
+                    summ = 0
+                    ss = True
+                    for i in command[1]:
+
+                        server = bring_up_server([], i)
+                        err, value = server.aggregate(command[1])
+                        if err:
+                            ss = False
+                            break
+                        else:
+                            cls = dill.loads(value)
+                            e, v = cls.sum(command[-1])
+                            if e:
+                                print(v)
+                                ss = False
+                                break
+                            summ += v
+                    if ss:
+                        print(summ)
 
                 case "ENUM_KEYS":
                     server = bring_up_server(command[1], ns)
@@ -84,6 +93,7 @@ def connect_to_server(server_name_):
         
         except Pyro4.errors.NamingError:
             print("Server Is Not Available")
+
 
 def enum_controller():
     daemon = Pyro4.core.Daemon()
@@ -97,6 +107,7 @@ def enum_controller():
 def bring_up_server(command_, ns):
     if command_:
         ns = command_[0]
+    Pyro4.config.SERIALIZER = 'dill'
     return Pyro4.Proxy("PYRONAME:" + URL + ns)
 
 

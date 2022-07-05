@@ -1,4 +1,5 @@
 from Core.RepException import *
+import Pyro4
 
 
 class Connector:
@@ -14,7 +15,9 @@ class Connector:
                      "SET",
                      "DSUM"]
 
-    def examine(self, msg):
+    URL = "connect.repo."
+
+    def examine(self, msg,ns):
         result = self.__check_input(msg)
         if result:
             command = msg.split()
@@ -22,40 +25,48 @@ class Connector:
             # SET
             if command[0].upper() == "SET":
                 dst, var = self.__break_command(command)
-                return "SET", dst, var, int(command[-1])
+                server = self.__bring_up_server(dst, ns)
+                return "SET", server, var, int(command[-1])
 
             # ADD
             if command[0].upper() == "ADD":
                 dst, var = self.__break_command(command)
-                return "ADD", dst, var, int(command[-1])
+                server = self.__bring_up_server(dst, ns)
+                return "ADD", server, var, int(command[-1])
 
             # GET
             if command[0].upper() == "GET":
                 dst, var = self.__break_command(command)
-                return "GET", dst, var
+                server = self.__bring_up_server(dst, ns)
+                return "GET", server, var
 
             # GET_VALUES
             if command[0].upper() == "GET_VALUES":
                 dst, var = self.__break_command(command)
-                return "GET_VALUES", dst, var
+                server = self.__bring_up_server(dst, ns)
+                return "GET_VALUES", server, var
 
             # DELETE
             if command[0].upper() == "DELETE":
                 dst, var = self.__break_command(command)
-                return "DELETE", dst, var
+                server = self.__bring_up_server(dst, ns)
+                return "DELETE", server, var
 
             # LIST KEYS
             if command[0].upper() == "LIST":
-                return "LIST", self.__able_no_arg(command)
+                server = self.__bring_up_server(self.__able_no_arg(command), ns)
+                return "LIST", server
 
             # SUM
             if command[0].upper() == "SUM":
                 dst, var = self.__break_command(command)
-                return "SUM", dst, var
+                server = self.__bring_up_server(dst, ns)
+                return "SUM", server, var
 
             # RESET
             if command[0].upper() == "RESET":
-                return "RESET", self.__able_no_arg(command)
+                server = self.__bring_up_server(self.__able_no_arg(command), ns)
+                return "RESET", server
 
             # DSUM
             if command[0].upper() == "DSUM":
@@ -98,5 +109,12 @@ class Connector:
         if len(msg) == 2:
             dst = [msg[1]]
         return dst
+
+    def __bring_up_server(self, command_, ns):
+        if command_:
+            ns = command_[0]
+        Pyro4.config.SERIALIZER = 'dill'
+        return Pyro4.Proxy("PYRONAME:" + Connector.URL + ns)
+
 
 

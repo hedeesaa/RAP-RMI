@@ -10,7 +10,6 @@ class IAggregate(ABC):
 
 class IRepository(IAggregate):
     repo = {}
-
     # IAggregate Interface Method
     @abstractmethod
     def sum(self, variable: str) -> int: pass

@@ -7,7 +7,7 @@ class Registry(IRegistry):
 
     def find(self, server_id):
         for server_id in IRegistry.peers.keys():
-            return IRegistry.peers.keys[server_id]
+            return IRegistry.peers[server_id]
 
     def list_peers(self):
         return IRegistry.peers
@@ -20,6 +20,8 @@ class Registry(IRegistry):
         IRegistry.peers[server_id] = url
         print(IRegistry.peers)
 
+    def all(self):
+        return IRegistry.peers
 
 
 

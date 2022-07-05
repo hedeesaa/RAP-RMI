@@ -1,9 +1,15 @@
 from Core.IRepository import IDistributedRepository
+from Core.RepException import *
+import dill
 import Pyro4
 
 
 @Pyro4.expose
 class Repository(IDistributedRepository):
+
+    def __init__(self, id):
+        self.id = id
+        self.repo = IDistributedRepository.repo
 
     def set_variable(self, variable: str, value: int):
         IDistributedRepository.repo[variable] = [value]
@@ -16,7 +22,7 @@ class Repository(IDistributedRepository):
             IDistributedRepository.repo[variable].append(value)
         except:
             error = True
-            res = "Variable Does Not Exist"
+            res = str(VariableDoesNotExist(variable))
         return error, res
 
     def get_value(self, variable):
@@ -24,7 +30,7 @@ class Repository(IDistributedRepository):
         try:
             value = IDistributedRepository.repo[variable][0]
         except:
-            value = "Variable Does Not Exist"
+            value = str(VariableDoesNotExist(variable))
             error = True
 
         return error, value
@@ -34,18 +40,20 @@ class Repository(IDistributedRepository):
         try:
             value = IDistributedRepository.repo[variable]
         except:
-            value = 0
+            value = str(VariableDoesNotExist(variable))
             error = True
 
         return error, value
 
     def delete_variable(self, variable: str) -> bool:
         error = False
+        res = "OK"
         try:
             del IDistributedRepository.repo[variable]
         except:
             error = True
-        return error, "OK"
+            res = str(VariableDoesNotExist(variable))
+        return error, res
     
     def list_keys(self):
         list_repo = list(IDistributedRepository.repo.keys())
@@ -54,9 +62,9 @@ class Repository(IDistributedRepository):
     def sum(self, variable: str):
         error = False
         try:
-            value = sum(IDistributedRepository.repo[variable])
+            value = sum(self.repo[variable])
         except:
-            value = 0
+            value = str(VariableDoesNotExist(variable))
             error = True
         return error, value
 
@@ -64,23 +72,12 @@ class Repository(IDistributedRepository):
         IDistributedRepository.repo = {}
         return False, "OK"
 
-    def aggregate(self, variable, peer_list):
+    def aggregate(self, peer_list):
         err = False
-        res = 0
         for peer in peer_list:
-            if peer in IDistributedRepository.peers.keys():
-                server = Pyro4.Proxy("PYRONAME:" + "connect.repo." + peer)
-                err, value = server.sum(variable)
-                if err:
-                    err = True
-                    res = f"Variable {variable} Does Not Exist on peer {peer}"
-                    break
-                res += value
-            else:
-                err = True
-                res = f"Peer {peer} Is Not Existed"
-                break
-        return err, res
+            if peer == self.id:
+                return err, dill.dumps(Repository(self.id))
+        return True, str(RepoDoesNotExist)
 
     @Pyro4.callback
     def enum_keys(self, callback):
@@ -92,7 +89,6 @@ class Repository(IDistributedRepository):
             callback.call(True, "")
         else:
             callback.call(False, IDistributedRepository.repo[variable])
-
 
 
 

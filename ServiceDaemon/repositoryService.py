@@ -12,6 +12,7 @@ class RepositoryService:
 
     def __init__(self, server_id, repository):
         self.id = server_id
+        Pyro4.config.SERIALIZERS_ACCEPTED.add('dill')
         self.daemon_join = Pyro4.Daemon()
         self.daemon_repo = Pyro4.Daemon()
         self.repository = repository
@@ -34,7 +35,7 @@ class RepositoryService:
         self.daemon_join.requestLoop()
 
     def start_repo_daemon(self):
-        r_repo = self.daemon_repo.register(self.repository)
+        r_repo = self.daemon_repo.register(self.repository("r1"))
         address_repo = RepositoryService.URL_REPO + self.id
         self.ns.register(address_repo, str(r_repo))
 
@@ -62,7 +63,7 @@ class RepositoryService:
         t1.start()
 
     def __join_helper(self, dst, info):
-        print(f"dest: {dst}, info: {info}")
+
         server = Pyro4.Proxy("PYRONAME:"+RepositoryService.URL_JOIN + dst)
         server.register(info, RepositoryService.URL_REPO + info)
 
