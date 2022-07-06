@@ -2,7 +2,13 @@
 
 ```
 export PYRO_SERIALIZERS_ACCEPTED=dill
+export PYRO_SERIALIZER=dill
 python3 -m Pyro4.naming
+```
+
+```
+export PYRO_SERIALIZERS_ACCEPTED=dill
+export PYRO_SERIALIZER=dill
 python3 server.py <SERVER_ID> [<PEER_ID>]
 ```
 
@@ -20,6 +26,7 @@ python3 server.py r2 r1
 Client is Interactive.
 
 ```
+export PYRO_SERIALIZERS_ACCEPTED=dill
 export PYRO_SERIALIZER=dill
 python3 client.py <SERVER_ID>
 ```
